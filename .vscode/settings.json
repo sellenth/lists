@@ -1,0 +1,12 @@
+{
+    "emeraldwalk.runonsave": {
+        "autoClearConsole": true,
+        "commands": [
+            {
+                "match": ".*",
+                "isAsync": true,
+                "cmd": "cargo test"
+            },
+        ]
+    }
+}
