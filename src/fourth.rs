@@ -1,5 +1,5 @@
-use std::rc::Rc;
 use std::cell::{Ref, RefCell, RefMut};
+use std::rc::Rc;
 
 pub struct List<T> {
     head: Link<T>,
@@ -18,31 +18,33 @@ struct Node<T> {
 
 impl<T> Node<T> {
     pub fn new(elem: T) -> Rc<RefCell<Self>> {
-        Rc::new(RefCell::new(
-            Node { 
-                elem: elem, 
-                prev: None, 
-                next: None,
-            }))
+        Rc::new(RefCell::new(Node {
+            elem: elem,
+            prev: None,
+            next: None,
+        }))
     }
 }
 
 impl<T> Iterator for IntoIter<T> {
     type Item = T;
-    fn next (&mut self) -> Option<Self::Item> {
+    fn next(&mut self) -> Option<Self::Item> {
         self.0.pop_front()
     }
 }
 
 impl<T> DoubleEndedIterator for IntoIter<T> {
-    fn next_back (&mut self) -> Option<T> {
+    fn next_back(&mut self) -> Option<T> {
         self.0.pop_back()
     }
 }
 
 impl<T> List<T> {
     pub fn new() -> Self {
-        List { head: None, tail: None}
+        List {
+            head: None,
+            tail: None,
+        }
     }
 
     pub fn into_iter(self) -> IntoIter<T> {
@@ -80,9 +82,9 @@ impl<T> List<T> {
     }
 
     pub fn peek_front(&self) -> Option<Ref<T>> {
-        self.head.as_ref().map(|node| {
-            Ref::map(node.borrow(), |node| &node.elem)
-        })
+        self.head
+            .as_ref()
+            .map(|node| Ref::map(node.borrow(), |node| &node.elem))
     }
 
     pub fn push_back(&mut self, elem: T) {
@@ -101,14 +103,14 @@ impl<T> List<T> {
     }
 
     pub fn pop_back(&mut self) -> Option<T> {
-        self.tail.take().map(|old_tail| { 
+        self.tail.take().map(|old_tail| {
             match old_tail.borrow_mut().prev.take() {
-                Some(new_tail) => { 
-                    new_tail.borrow_mut().next.take(); 
+                Some(new_tail) => {
+                    new_tail.borrow_mut().next.take();
                     self.tail = Some(new_tail);
                 }
                 None => {
-                    self.head.take(); 
+                    self.head.take();
                 }
             }
             Rc::try_unwrap(old_tail).ok().unwrap().into_inner().elem
@@ -116,27 +118,27 @@ impl<T> List<T> {
     }
 
     pub fn peek_back(&self) -> Option<Ref<T>> {
-        self.tail.as_ref().map(|node| {
-            Ref::map(node.borrow(), |node| &node.elem)
-        })
+        self.tail
+            .as_ref()
+            .map(|node| Ref::map(node.borrow(), |node| &node.elem))
     }
 
     pub fn peek_back_mut(&self) -> Option<RefMut<T>> {
-        self.tail.as_ref().map(|node| {
-            RefMut::map(node.borrow_mut(), |node| &mut node.elem)
-        })
+        self.tail
+            .as_ref()
+            .map(|node| RefMut::map(node.borrow_mut(), |node| &mut node.elem))
     }
 
     pub fn peek_front_mut(&self) -> Option<RefMut<T>> {
-        self.head.as_ref().map(|node| {
-            RefMut::map(node.borrow_mut(), |node| &mut node.elem)
-        })
+        self.head
+            .as_ref()
+            .map(|node| RefMut::map(node.borrow_mut(), |node| &mut node.elem))
     }
 }
 
 impl<T> Drop for List<T> {
     fn drop(&mut self) {
-        while self.pop_front().is_some() { }
+        while self.pop_front().is_some() {}
     }
 }
 
@@ -174,9 +176,9 @@ mod test {
 
         assert!(list.peek_front().is_none());
 
-        list.push_front(3); 
-        list.push_front(2); 
-        list.push_front(1); 
+        list.push_front(3);
+        list.push_front(2);
+        list.push_front(1);
 
         assert_eq!(&*list.peek_front().unwrap(), &1);
     }
@@ -212,5 +214,4 @@ mod test {
         assert_eq!(itr.next_back(), None);
         assert_eq!(itr.next(), None);
     }
-
 }

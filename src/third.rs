@@ -8,7 +8,7 @@ pub struct List<T> {
 
 pub struct Node<T> {
     val: T,
-    next: Link<T>
+    next: Link<T>,
 }
 
 pub struct Iter<'a, T> {
@@ -21,20 +21,24 @@ impl<T> List<T> {
     }
 
     pub fn prepend(&self, elem: T) -> List<T> {
-        List { 
-            head: Some( Arc::new( Node {
-                    val: elem,
-                    next: self.head.clone()
-                }))
+        List {
+            head: Some(Arc::new(Node {
+                val: elem,
+                next: self.head.clone(),
+            })),
         }
     }
 
     pub fn iter(&self) -> Iter<T> {
-        Iter { next: self.head.as_deref() }
+        Iter {
+            next: self.head.as_deref(),
+        }
     }
 
     pub fn tail(&self) -> List<T> {
-        List { head: self.head.as_ref().and_then(|node| node.next.clone()) }
+        List {
+            head: self.head.as_ref().and_then(|node| node.next.clone()),
+        }
     }
 
     pub fn head(&self) -> Option<&T> {
@@ -43,7 +47,7 @@ impl<T> List<T> {
 }
 
 impl<T> Drop for List<T> {
-    fn drop(&mut self){
+    fn drop(&mut self) {
         let mut head = self.head.take();
         while let Some(node) = head {
             if let Ok(mut node) = Arc::try_unwrap(node) {

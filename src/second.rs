@@ -1,6 +1,6 @@
 struct Node<T> {
     elem: T,
-    next: Link<T>
+    next: Link<T>,
 }
 
 type Link<T> = Option<Box<Node<T>>>;
@@ -11,22 +11,22 @@ pub struct List<T> {
 
 //Iterator stuff
 pub struct IntoIter<T>(List<T>);
-pub struct Iter<'a, T>{
+pub struct Iter<'a, T> {
     next: Option<&'a Node<T>>,
 }
-pub struct IterMut<'a, T>{
+pub struct IterMut<'a, T> {
     next: Option<&'a mut Node<T>>,
 }
 
 impl<T> List<T> {
     pub fn new() -> Self {
-        List { head: None}
+        List { head: None }
     }
 
     pub fn push(&mut self, elem: T) {
         let new_node = Box::new(Node {
             elem: elem,
-            next: self.head.take()
+            next: self.head.take(),
         });
 
         self.head = Some(new_node)
@@ -40,37 +40,37 @@ impl<T> List<T> {
     }
 
     pub fn peek(&self) -> Option<&T> {
-        self.head.as_ref().map(|node| {
-            &node.elem
-        })
+        self.head.as_ref().map(|node| &node.elem)
     }
 
     pub fn peek_mut(&mut self) -> Option<&mut T> {
-        self.head.as_mut().map(|node| {
-            &mut node.elem
-        })
+        self.head.as_mut().map(|node| &mut node.elem)
     }
 
     // should this be &self?
     pub fn into_iter(self) -> IntoIter<T> {
-        IntoIter(self) 
+        IntoIter(self)
     }
 
     pub fn iter<'a>(&'a self) -> Iter<'a, T> {
-        Iter {next: self.head.as_deref()}
+        Iter {
+            next: self.head.as_deref(),
+        }
     }
 
     pub fn iter_mut<'a>(&'a mut self) -> IterMut<'a, T> {
-        IterMut {next: self.head.as_deref_mut()}
+        IterMut {
+            next: self.head.as_deref_mut(),
+        }
     }
 }
 
 impl<T> Drop for List<T> {
-    fn drop(&mut self){
-        let mut curr_node = self.head.take(); 
+    fn drop(&mut self) {
+        let mut curr_node = self.head.take();
 
         while let Some(mut boxed_node) = curr_node {
-            curr_node = boxed_node.next.take(); 
+            curr_node = boxed_node.next.take();
         }
     }
 }
@@ -144,9 +144,7 @@ mod test {
 
         assert_eq!(list.peek(), Some(&1));
         assert_eq!(list.peek_mut(), Some(&mut 1));
-        list.peek_mut().map(|value| {
-            *value = 66
-        });
+        list.peek_mut().map(|value| *value = 66);
         assert_eq!(list.peek(), Some(&66));
     }
 
@@ -186,14 +184,14 @@ mod test {
         list.push(9);
 
         let mut itr = list.iter_mut();
-        itr.next().map(|node| { *node = 4});
+        itr.next().map(|node| *node = 4);
         assert_eq!(itr.next(), Some(&mut 6));
         assert_eq!(itr.next(), Some(&mut 3));
         assert_eq!(itr.next(), None);
         assert_eq!(list.peek(), Some(&4));
 
         let mut itr2 = list.iter_mut();
-        itr2.next().map(|node| { *node = 9});
+        itr2.next().map(|node| *node = 9);
         assert_eq!(itr2.next(), Some(&mut 6));
         assert_eq!(itr2.next(), Some(&mut 3));
         assert_eq!(itr2.next(), None);

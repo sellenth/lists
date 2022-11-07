@@ -1,18 +1,18 @@
 use std::mem;
 
 pub struct List {
-    head: Link
+    head: Link,
 }
 
 impl List {
     pub fn new() -> Self {
-        List { head: Link::Empty}
+        List { head: Link::Empty }
     }
 
     pub fn push(&mut self, elem: i32) {
         let new_node = Box::new(Node {
             val: elem,
-            next: mem::replace(&mut self.head, Link::Empty )
+            next: mem::replace(&mut self.head, Link::Empty),
         });
 
         self.head = Link::More(new_node)
@@ -27,11 +27,10 @@ impl List {
             }
         }
     }
-
 }
 
 impl Drop for List {
-    fn drop(&mut self){
+    fn drop(&mut self) {
         let mut curr_node = mem::replace(&mut self.head, Link::Empty);
 
         while let Link::More(mut boxed_node) = curr_node {
@@ -42,12 +41,12 @@ impl Drop for List {
 
 struct Node {
     val: i32,
-    next: Link
+    next: Link,
 }
 
 enum Link {
     Empty,
-    More(Box<Node>)
+    More(Box<Node>),
 }
 
 #[cfg(test)]
